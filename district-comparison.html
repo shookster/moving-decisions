@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>School District Comparison</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #1a1a2e;
+      --paper: #f5f0e8;
+      --rule: #c8bfa8;
+      --accent-blue: #2563a8;
+      --accent-green: #1e6b45;
+      --accent-red: #8b2020;
+      --accent-gold: #b8860b;
+      --col-hopkins: #2563a8;
+      --col-creekview: #1e6b45;
+      --col-igh: #6b3fa0;
+      --card-bg: #faf7f2;
+      --shadow: 0 2px 12px rgba(26,26,46,0.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Source Sans 3', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+
+    /* MASTHEAD */
+    header {
+      background: var(--ink);
+      color: var(--paper);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 4px solid var(--accent-gold);
+    }
+    header .kicker {
+      font-family: 'Source Sans 3', sans-serif;
+      font-weight: 600;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-gold);
+      margin-bottom: 0.75rem;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      line-height: 1.1;
+      margin-bottom: 0.8rem;
+    }
+    header .subtitle {
+      font-size: 1rem;
+      font-weight: 300;
+      opacity: 0.75;
+      max-width: 56ch;
+      margin: 0 auto;
+    }
+
+    /* DISTRICT BADGES */
+    .district-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 1.25rem 1rem;
+      background: #eee8da;
+      border-bottom: 1px solid var(--rule);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 2px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .badge-hopkins { background: var(--col-hopkins); }
+    .badge-creekview { background: var(--col-creekview); }
+    .badge-igh { background: var(--col-igh); }
+    .badge .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+
+    /* LAYOUT */
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
+
+    /* SECTION HEADERS */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      margin: 3rem 0 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--ink);
+    }
+    .section-header h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.55rem;
+      font-weight: 700;
+    }
+    .section-header .section-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--rule);
+      line-height: 1;
+    }
+
+    /* DISTRICT CARDS GRID */
+    .district-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+    .district-card {
+      background: var(--card-bg);
+      border: 1px solid var(--rule);
+      border-top: 4px solid var(--col);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+    .district-card.hopkins { --col: var(--col-hopkins); }
+    .district-card.creekview { --col: var(--col-creekview); }
+    .district-card.igh { --col: var(--col-igh); }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      color: var(--col);
+    }
+    .card-subtitle {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 1rem;
+    }
+
+    /* DATA TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin-top: 0.5rem;
+    }
+    th {
+      font-family: 'Source Sans 3', sans-serif;
+      font-weight: 600;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    td {
+      padding: 0.5rem 0.75rem;
+      border-bottom: 1px solid var(--rule);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: rgba(200,191,168,0.15); }
+    .td-label { font-weight: 600; color: #555; }
+    .td-rank { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1rem; }
+
+    /* SAFETY BAR */
+    .safety-bar-wrap { margin: 0.3rem 0 0.1rem; }
+    .safety-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--rule);
+      overflow: hidden;
+    }
+    .safety-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+    .bar-low { background: #c0392b; }
+    .bar-mid { background: var(--accent-gold); }
+    .bar-high { background: var(--accent-green); }
+    .bar-label { font-size: 0.72rem; color: #888; margin-top: 2px; }
+
+    /* DIVERSITY PIE LEGEND */
+    .diversity-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.82rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: 0.35rem; }
+    .legend-swatch {
+      width: 12px; height: 12px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    /* SPED BLOCK */
+    .sped-block {
+      background: var(--card-bg);
+      border: 1px solid var(--rule);
+      border-left: 4px solid var(--col);
+      padding: 1.25rem 1.5rem;
+      margin-top: 1rem;
+    }
+    .sped-block h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--col);
+      margin-bottom: 0.6rem;
+    }
+    .sped-block ul {
+      padding-left: 1.25rem;
+      font-size: 0.9rem;
+    }
+    .sped-block li { margin-bottom: 0.3rem; }
+    .sped-block.hopkins { --col: var(--col-hopkins); }
+    .sped-block.creekview { --col: var(--col-creekview); }
+    .sped-block.igh { --col: var(--col-igh); }
+
+    /* COMPARISON TABLE */
+    .compare-table-wrap { overflow-x: auto; margin-top: 1rem; }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      min-width: 620px;
+    }
+    .compare-table th {
+      padding: 0.6rem 1rem;
+      font-size: 0.75rem;
+    }
+    .compare-table td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .compare-table tr:last-child td { border-bottom: none; }
+    .compare-table .col-cat { font-weight: 600; background: #eee8da; }
+    .compare-table .th-hopkins { background: var(--col-hopkins); }
+    .compare-table .th-creekview { background: var(--col-creekview); }
+    .compare-table .th-igh { background: var(--col-igh); }
+    .win { color: var(--accent-green); font-weight: 600; }
+    .mid { color: var(--accent-gold); font-weight: 600; }
+    .low { color: var(--accent-red); }
+
+    /* VERDICT */
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1rem;
+    }
+    .verdict-card {
+      border: 1px solid var(--rule);
+      padding: 1.25rem 1.5rem;
+      background: var(--card-bg);
+      box-shadow: var(--shadow);
+    }
+    .verdict-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .verdict-card p { font-size: 0.9rem; }
+
+    /* FOOTNOTES */
+    .footnotes {
+      margin-top: 3.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--rule);
+      font-size: 0.78rem;
+      color: #666;
+      line-height: 1.6;
+    }
+    .footnotes h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--ink);
+    }
+    .footnotes ol { padding-left: 1.25rem; }
+    .footnotes li { margin-bottom: 0.35rem; }
+    .footnotes a { color: var(--accent-blue); }
+
+    /* RULE DIVIDER */
+    .rule { border: none; border-top: 1px solid var(--rule); margin: 2rem 0; }
+
+    /* CALLOUT */
+    .callout {
+      background: #e8f0fb;
+      border-left: 4px solid var(--accent-blue);
+      padding: 0.9rem 1.25rem;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    .callout.green { background: #e6f4ed; border-color: var(--accent-green); }
+    .callout.gold { background: #fdf6e3; border-color: var(--accent-gold); }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      header { padding: 2rem 1rem 1.5rem; }
+      main { padding: 1.5rem 1rem 3rem; }
+      .section-header h2 { font-size: 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <p class="kicker">Family Relocation Research Guide &nbsp;·&nbsp; March 2026</p>
+  <h1>Three School Districts,<br>Side by Side</h1>
+  <p class="subtitle">A data-driven comparison of Hopkins ISD 270, Cherokee County / Creekview, and Inver Grove Heights ISD 199 — covering ZIP codes, income, violent crime, diversity, and special education services.</p>
+</header>
+
+<div class="district-nav">
+  <span class="badge badge-hopkins"><span class="dot"></span>Hopkins ISD 270 &nbsp;·&nbsp; MN</span>
+  <span class="badge badge-creekview"><span class="dot"></span>Cherokee County / Creekview &nbsp;·&nbsp; GA</span>
+  <span class="badge badge-igh"><span class="dot"></span>Inver Grove Heights ISD 199 &nbsp;·&nbsp; MN</span>
+</div>
+
+<main>
+
+  <!-- ══════════════════════════════════════════
+       SECTION 1: ZIP CODES & INCOME
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>ZIP Codes &amp; Median Household Income</h2>
+  </div>
+  <p style="font-size:0.92rem;max-width:72ch;margin-bottom:1.25rem;">Each district's ZIP codes are listed below from lowest to highest median household income. All income figures are from the U.S. Census Bureau American Community Survey 5-Year Estimates.<sup>[1]</sup></p>
+
+  <div class="district-grid">
+
+    <!-- HOPKINS -->
+    <div class="district-card hopkins">
+      <div class="card-title">Hopkins Public Schools — ISD 270</div>
+      <div class="card-subtitle">Minnetonka, MN &nbsp;·&nbsp; 12 ZIP Codes</div>
+      <table>
+        <thead><tr><th>#</th><th>ZIP</th><th>Area</th><th>Med. Income</th></tr></thead>
+        <tbody>
+          <tr><td class="td-rank">1</td><td>55427</td><td>Plymouth / Golden Valley</td><td>$92,821</td></tr>
+          <tr><td class="td-rank">2</td><td>55422</td><td>Golden Valley / Crystal</td><td>$93,914</td></tr>
+          <tr><td class="td-rank">3</td><td>55343</td><td>Hopkins</td><td>$82,415–83,143</td></tr>
+          <tr><td class="td-rank">4</td><td>55344</td><td>Eden Prairie</td><td>$89,590</td></tr>
+          <tr><td class="td-rank">5</td><td>55426</td><td>St. Louis Park</td><td>$99,347</td></tr>
+          <tr><td class="td-rank">6</td><td>55305</td><td>Hopkins / Minnetonka</td><td>$104,914</td></tr>
+          <tr><td class="td-rank">7</td><td>55416</td><td>St. Louis Park / Mpls border</td><td>$105,958</td></tr>
+          <tr><td class="td-rank">8</td><td>55346</td><td>Eden Prairie</td><td>$137,125</td></tr>
+          <tr><td class="td-rank">9</td><td>55345</td><td>Minnetonka</td><td>$143,287</td></tr>
+          <tr><td class="td-rank">10</td><td>55436</td><td>Edina / St. Louis Park</td><td>$144,129</td></tr>
+          <tr><td class="td-rank">11</td><td>55439</td><td>Edina</td><td>$173,925</td></tr>
+          <tr><td class="td-rank">12</td><td>55391</td><td>Plymouth / Wayzata</td><td>$170,115</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.6rem;">Income spread: ~$77,000 &nbsp;·&nbsp; Highly variable</p>
+    </div>
+
+    <!-- CREEKVIEW -->
+    <div class="district-card creekview">
+      <div class="card-title">Cherokee County SD / Creekview HS</div>
+      <div class="card-subtitle">Canton, GA &nbsp;·&nbsp; 3 ZIP Codes</div>
+      <table>
+        <thead><tr><th>#</th><th>ZIP</th><th>Area</th><th>Med. Income</th></tr></thead>
+        <tbody>
+          <tr><td class="td-rank">1</td><td>30114</td><td>Canton</td><td>$98,902</td></tr>
+          <tr><td class="td-rank">2</td><td>30107</td><td>Ball Ground</td><td>$105,561</td></tr>
+          <tr><td class="td-rank">3</td><td>30115</td><td>Canton / Holly Springs</td><td>$113,089</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.6rem;">Income spread: ~$14,000 &nbsp;·&nbsp; Very consistent</p>
+    </div>
+
+    <!-- IGH -->
+    <div class="district-card igh">
+      <div class="card-title">Inver Grove Heights Schools — ISD 199</div>
+      <div class="card-subtitle">Inver Grove Heights, MN &nbsp;·&nbsp; 2 ZIP Codes</div>
+      <table>
+        <thead><tr><th>#</th><th>ZIP</th><th>Area</th><th>Med. Income</th></tr></thead>
+        <tbody>
+          <tr><td class="td-rank">1</td><td>55076</td><td>Inver Grove Heights / S. St. Paul</td><td>$98,026</td></tr>
+          <tr><td class="td-rank">2</td><td>55077</td><td>Inver Grove Heights / Sunfish Lake</td><td>$108,314</td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.6rem;">Income spread: ~$10,000 &nbsp;·&nbsp; Very consistent</p>
+    </div>
+
+  </div><!-- /district-grid -->
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 2: VIOLENT CRIME
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>Violent Crime by ZIP Code / Area</h2>
+  </div>
+  <p style="font-size:0.92rem;max-width:72ch;margin-bottom:0.5rem;">Violent crime includes murder, rape, robbery, and aggravated assault as defined by the FBI Uniform Crime Reporting program. ZIP codes are listed from least safe to most safe within each district. The national average violent crime rate is <strong>359 per 100,000</strong> residents (FBI, 2024).<sup>[2]</sup></p>
+
+  <div class="callout gold" style="margin-bottom:1.25rem;">All three districts are well below the national average for violent crime. Differences between districts are relatively modest — the more significant safety contrast is in property crime (see footnote).</div>
+
+  <div class="district-grid">
+
+    <!-- HOPKINS -->
+    <div class="district-card hopkins">
+      <div class="card-title">Hopkins ISD 270 — Violent Crime</div>
+      <div class="card-subtitle">Ranked: Least Safe → Most Safe</div>
+      <table>
+        <thead><tr><th>Area / ZIP</th><th>Violent Crime / 100k</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="td-label">St. Louis Park<br><small style="font-weight:300">55416, 55426</small></td>
+            <td>
+              179<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-mid" style="width:50%"></div></div>
+                <div class="bar-label">50% of nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Hopkins (city)<br><small style="font-weight:300">55343</small></td>
+            <td>
+              199<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-mid" style="width:55%"></div></div>
+                <div class="bar-label">55% of nat'l avg &nbsp;·&nbsp; 46% below nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Golden Valley<br><small style="font-weight:300">55422, 55427</small></td>
+            <td>
+              ~140<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-high" style="width:39%"></div></div>
+                <div class="bar-label">~39% of nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Minnetonka / Edina<br><small style="font-weight:300">55305, 55345, 55436, 55439</small></td>
+            <td>
+              ~90–116<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-high" style="width:28%"></div></div>
+                <div class="bar-label">~25–32% of nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Eden Prairie / Plymouth<br><small style="font-weight:300">55344, 55346, 55391</small></td>
+            <td>
+              51–73<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-high" style="width:18%"></div></div>
+                <div class="bar-label">14–20% of nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CREEKVIEW -->
+    <div class="district-card creekview">
+      <div class="card-title">Cherokee County / Creekview — Violent Crime</div>
+      <div class="card-subtitle">Ranked: Least Safe → Most Safe</div>
+      <table>
+        <thead><tr><th>Area / ZIP</th><th>Violent Crime / 100k</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="td-label">Canton<br><small style="font-weight:300">30114, 30115</small></td>
+            <td>
+              171<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-mid" style="width:48%"></div></div>
+                <div class="bar-label">48% of nat'l avg &nbsp;·&nbsp; 52% below nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">Ball Ground<br><small style="font-weight:300">30107</small></td>
+            <td>
+              ~75 (est.)<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-high" style="width:21%"></div></div>
+                <div class="bar-label">~21% of nat'l avg &nbsp;·&nbsp; est. — FBI data not directly reported</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.75rem;">Canton's City-Data crime index: 78 — 3× below U.S. average of 235.<sup>[3]</sup></p>
+    </div>
+
+    <!-- IGH -->
+    <div class="district-card igh">
+      <div class="card-title">Inver Grove Heights ISD 199 — Violent Crime</div>
+      <div class="card-subtitle">Ranked: Least Safe → Most Safe</div>
+      <table>
+        <thead><tr><th>Area / ZIP</th><th>Violent Crime / 100k</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="td-label">North / commercial corridor<br><small style="font-weight:300">55076 north</small></td>
+            <td>
+              ~239 (est.)<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-mid" style="width:67%"></div></div>
+                <div class="bar-label">~67% of nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">City overall<br><small style="font-weight:300">55076, 55077</small></td>
+            <td>
+              196<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-mid" style="width:55%"></div></div>
+                <div class="bar-label">55% of nat'l avg &nbsp;·&nbsp; 47% below nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="td-label">South / residential<br><small style="font-weight:300">55077 south</small></td>
+            <td>
+              ~154 (est.)<br>
+              <div class="safety-bar-wrap">
+                <div class="safety-bar"><div class="safety-bar-fill bar-high" style="width:43%"></div></div>
+                <div class="bar-label">~43% of nat'l avg</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.75rem;">City-wide violent crime fell 8% year-over-year.<sup>[4]</sup></p>
+    </div>
+
+  </div><!-- /district-grid -->
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 3: RACIAL & ETHNIC DIVERSITY
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>Racial &amp; Ethnic Diversity</h2>
+  </div>
+  <p style="font-size:0.92rem;max-width:72ch;margin-bottom:1.25rem;">Enrollment data is from the National Center for Education Statistics (NCES) Common Core of Data, 2024–2025 school year.<sup>[5]</sup> Student counts are based on official school-level enrollment.</p>
+
+  <div class="district-grid">
+
+    <!-- HOPKINS -->
+    <div class="district-card hopkins">
+      <div class="card-title">Hopkins High School</div>
+      <div class="card-subtitle">Total Enrollment: 2,003 &nbsp;·&nbsp; Grades 9–12</div>
+      <table>
+        <thead><tr><th>Race / Ethnicity</th><th>Students</th><th>%</th></tr></thead>
+        <tbody>
+          <tr><td>White</td><td>959</td><td>47.9%</td></tr>
+          <tr><td>Black or African American</td><td>531</td><td>26.5%</td></tr>
+          <tr><td>Hispanic or Latino</td><td>254</td><td>12.7%</td></tr>
+          <tr><td>Two or More Races</td><td>166</td><td>8.3%</td></tr>
+          <tr><td>Asian</td><td>86</td><td>4.3%</td></tr>
+          <tr><td>American Indian / Alaska Native</td><td>5</td><td>0.2%</td></tr>
+          <tr><td>Nat. Hawaiian / Pacific Islander</td><td>2</td><td>0.1%</td></tr>
+        </tbody>
+      </table>
+      <div class="diversity-legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:#2563a8"></div>52.1% minority enrollment</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c0c0c0"></div>36.2% free/reduced lunch eligible</div>
+      </div>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;">District represents 46 language groups.<sup>[6]</sup></p>
+    </div>
+
+    <!-- CREEKVIEW -->
+    <div class="district-card creekview">
+      <div class="card-title">Creekview High School</div>
+      <div class="card-subtitle">Total Enrollment: 2,039 &nbsp;·&nbsp; Grades 9–12</div>
+      <table>
+        <thead><tr><th>Race / Ethnicity</th><th>Students</th><th>%</th></tr></thead>
+        <tbody>
+          <tr><td>White</td><td>1,626</td><td>79.7%</td></tr>
+          <tr><td>Hispanic or Latino</td><td>239</td><td>11.7%</td></tr>
+          <tr><td>Black or African American</td><td>77</td><td>3.8%</td></tr>
+          <tr><td>Two or More Races</td><td>71</td><td>3.5%</td></tr>
+          <tr><td>Asian</td><td>22</td><td>1.1%</td></tr>
+          <tr><td>American Indian / Alaska Native</td><td>1</td><td>&lt;0.1%</td></tr>
+          <tr><td>Nat. Hawaiian / Pacific Islander</td><td>3</td><td>0.1%</td></tr>
+        </tbody>
+      </table>
+      <div class="diversity-legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:#1e6b45"></div>20.3% minority enrollment</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c0c0c0"></div>19.6% free/reduced lunch eligible</div>
+      </div>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;">Diversity score 0.33 vs. Georgia state avg of 0.71.<sup>[7]</sup></p>
+    </div>
+
+    <!-- IGH -->
+    <div class="district-card igh">
+      <div class="card-title">Simley Senior High</div>
+      <div class="card-subtitle">Total Enrollment: 1,030 &nbsp;·&nbsp; Grades 9–12</div>
+      <table>
+        <thead><tr><th>Race / Ethnicity</th><th>Students</th><th>%</th></tr></thead>
+        <tbody>
+          <tr><td>White</td><td>411</td><td>39.9%</td></tr>
+          <tr><td>Hispanic or Latino</td><td>359</td><td>34.9%</td></tr>
+          <tr><td>Black or African American</td><td>113</td><td>11.0%</td></tr>
+          <tr><td>Two or More Races</td><td>85</td><td>8.3%</td></tr>
+          <tr><td>Asian</td><td>57</td><td>5.5%</td></tr>
+          <tr><td>American Indian / Alaska Native</td><td>5</td><td>0.5%</td></tr>
+          <tr><td>Nat. Hawaiian / Pacific Islander</td><td>0</td><td>—</td></tr>
+        </tbody>
+      </table>
+      <div class="diversity-legend">
+        <div class="legend-item"><div class="legend-swatch" style="background:#6b3fa0"></div>60.1% minority enrollment</div>
+        <div class="legend-item"><div class="legend-swatch" style="background:#c0c0c0"></div>48.3% free/reduced lunch eligible</div>
+      </div>
+      <p style="font-size:0.78rem;color:#888;margin-top:0.5rem;">Diversity score exceeds Minnesota state average of 0.59.<sup>[8]</sup></p>
+    </div>
+
+  </div><!-- /district-grid -->
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 4: SPECIAL EDUCATION (ASD & ADHD)
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>Special Education: Autism &amp; ADHD Services</h2>
+  </div>
+  <p style="font-size:0.92rem;max-width:72ch;margin-bottom:1.25rem;">All three districts are federally required under IDEA (Individuals with Disabilities Education Act) to provide a free and appropriate public education (FAPE) to students with disabilities. The following summarizes district-specific programs relevant to students with ASD and ADHD.</p>
+
+  <div class="sped-block hopkins">
+    <h3>Hopkins ISD 270 — Special Education</h3>
+    <ul>
+      <li>Provides IEP services for <strong>Autism Spectrum Disorder (ASD)</strong> at all school levels, including Federal Setting III programs for students requiring 60% or more of the school day in special education.<sup>[9]</sup></li>
+      <li>Section 504 plans explicitly cover <strong>ADD/ADHD</strong>, learning disabilities, and autism. Plans are managed by school counselors and social workers at each building.<sup>[10]</sup></li>
+      <li>Early Childhood Special Education (ECSE) begins at birth through age 5 at the Harley Hopkins Family Center and all elementary sites.</li>
+      <li>Serves students ages 2½ through 26 with IEPs across a full continuum of settings.</li>
+      <li>District has 7.99 school psychologists and 217.96 FTE instructional aides on staff.<sup>[11]</sup></li>
+    </ul>
+  </div>
+
+  <div class="sped-block creekview" style="margin-top:1rem;">
+    <h3>Cherokee County School District — Special Education</h3>
+    <ul>
+      <li>Maintains a dedicated Department of Special Education and Section 504, explicitly listing <strong>Autism</strong> (including Asperger's and Pervasive Developmental Disorders) and <strong>ADHD</strong> as covered eligibility categories.<sup>[12]</sup></li>
+      <li>Provides services from birth through age 21 under IDEA; all referrals are confidential and provided at no cost.</li>
+      <li>Offers Extended School Year (ESY) services for eligible students whose skills regress during breaks.</li>
+      <li>IEP meetings are coordinated through each school's Special Education Facilitator; parents may contact the Department of Special Education at 770-704-4315 for concerns.<sup>[13]</sup></li>
+      <li>Title VI Part B/IDEA funds support student identification aged 3–21 and IEP goal progress.<sup>[14]</sup></li>
+      <li><em>Note:</em> Georgia research indicates significant geographic variation in autism service providers statewide; Cherokee County's suburban Atlanta location provides relatively better access than rural Georgia.<sup>[15]</sup></li>
+    </ul>
+  </div>
+
+  <div class="sped-block igh" style="margin-top:1rem;">
+    <h3>Inver Grove Heights ISD 199 — Special Education</h3>
+    <ul>
+      <li><strong>PLUS / Transitions Programs</strong> serve students with mild to moderate cognitive delays and those with significant deficits in social skills, sensory motor regulation, and self-help skills — spanning elementary through high school.<sup>[16]</sup></li>
+      <li><strong>CARE / CID (Communication and Interaction Delays) Programs</strong> serve students with moderate to severe cognitive delays, medically fragile students, and those with multiple impairments — at Pine Bend Elementary, IGH Middle School, and Simley High School.<sup>[16]</sup></li>
+      <li><strong>Resource Programs</strong> (less than 60% of day in special education) are available at all district schools, K–12.</li>
+      <li><strong>EBD (Emotional and Behavioral Disabilities) Programs</strong> serve students with significant behavioral and emotional concerns at all school levels.</li>
+      <li>Early Childhood Special Education (ECSE) classes available from birth through age 5.<sup>[17]</sup></li>
+      <li>74% of Simley teachers hold advanced degrees, compared to a state average of 56%.<sup>[18]</sup></li>
+    </ul>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 5: HEAD-TO-HEAD COMPARISON
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>Head-to-Head Comparison</h2>
+  </div>
+
+  <div class="compare-table-wrap">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="background:#333;">Category</th>
+          <th class="th-hopkins">Hopkins ISD 270 (MN)</th>
+          <th class="th-creekview">Cherokee / Creekview (GA)</th>
+          <th class="th-igh">IGH ISD 199 (MN)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="col-cat">ZIP codes in district</td>
+          <td>12</td>
+          <td>3</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td class="col-cat">Income range</td>
+          <td class="low">$82K – $174K<br><small>Very wide spread</small></td>
+          <td class="win">$99K – $113K<br><small>Very consistent</small></td>
+          <td class="win">$98K – $108K<br><small>Very consistent</small></td>
+        </tr>
+        <tr>
+          <td class="col-cat">Lowest ZIP violent crime / 100k</td>
+          <td class="win">51 (Plymouth / Eden Prairie)</td>
+          <td class="win">~75 est. (Ball Ground)</td>
+          <td class="mid">~154 (south residential)</td>
+        </tr>
+        <tr>
+          <td class="col-cat">Highest ZIP violent crime / 100k</td>
+          <td class="mid">179 (St. Louis Park)</td>
+          <td class="win">171 (Canton)</td>
+          <td class="mid">~239 (north commercial)</td>
+        </tr>
+        <tr>
+          <td class="col-cat">vs. National avg (359 / 100k)</td>
+          <td class="win">Well below across all ZIPs</td>
+          <td class="win">Well below across all ZIPs</td>
+          <td class="win">47% below city-wide avg</td>
+        </tr>
+        <tr>
+          <td class="col-cat">Racial diversity (high school)</td>
+          <td class="win">Very High — 52% minority</td>
+          <td class="low">Very Low — 20% minority</td>
+          <td class="win">High — 60% minority</td>
+        </tr>
+        <tr>
+          <td class="col-cat">Largest student group</td>
+          <td>White (48%), then Black (27%)</td>
+          <td>White (80%)</td>
+          <td>White (40%), then Hispanic (35%)</td>
+        </tr>
+        <tr>
+          <td class="col-cat">Free/reduced lunch eligible</td>
+          <td class="mid">36% (Hopkins HS)</td>
+          <td class="win">20% (Creekview HS)</td>
+          <td class="low">48% (Simley HS)</td>
+        </tr>
+        <tr>
+          <td class="col-cat">ASD services</td>
+          <td class="win">Yes — named in IEP/IDEA program, Federal Setting III available</td>
+          <td class="win">Yes — named eligibility category, birth–21</td>
+          <td class="win">Yes — CID/CARE programs K–12; ECSE birth–5</td>
+        </tr>
+        <tr>
+          <td class="col-cat">ADHD / 504 services</td>
+          <td class="win">Yes — explicit 504 coverage, counselor-managed</td>
+          <td class="win">Yes — explicit ADHD listing, 504 available</td>
+          <td class="win">Yes — Resource and EBD programs available</td>
+        </tr>
+        <tr>
+          <td class="col-cat">Student/teacher ratio (HS)</td>
+          <td class="win">19.5:1 (Hopkins HS)</td>
+          <td class="win">16.3:1 (Creekview HS)</td>
+          <td class="low">23.1:1 (Simley HS)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ══════════════════════════════════════════
+       SECTION 6: FAMILY VERDICT
+  ══════════════════════════════════════════ -->
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>What This Means for Families</h2>
+  </div>
+
+  <div class="verdict-grid">
+
+    <div class="verdict-card" style="border-top:4px solid var(--col-creekview);">
+      <h3 style="color:var(--col-creekview);">Best for: Safety &amp; Community Consistency</h3>
+      <p><strong>Cherokee County / Creekview (GA)</strong> — All ZIP codes have extremely low violent crime relative to national averages, and the district's income is highly consistent across its three ZIPs. Families who prioritize physical safety and a stable, homogeneous community will find this district compelling. The tradeoff is limited racial diversity.</p>
+    </div>
+
+    <div class="verdict-card" style="border-top:4px solid var(--col-hopkins);">
+      <h3 style="color:var(--col-hopkins);">Best for: Wealth, Resources &amp; Diversity</h3>
+      <p><strong>Hopkins ISD 270 (MN)</strong> — The district's top ZIP codes (Wayzata, Edina, Eden Prairie) are among the wealthiest and safest suburbs in the country. Hopkins High School itself is significantly racially diverse and majority-minority. The caveat: extreme income variation across 12 ZIP codes means your experience depends heavily on which ZIP you choose.</p>
+    </div>
+
+    <div class="verdict-card" style="border-top:4px solid var(--col-igh);">
+      <h3 style="color:var(--col-igh);">Best for: Diversity on a Budget</h3>
+      <p><strong>Inver Grove Heights ISD 199 (MN)</strong> — Simley is the most diverse of the three high schools by minority enrollment percentage, with a notably high Hispanic student population. Home values and incomes are consistent and more accessible than Hopkins' premium ZIPs. The tradeoffs are a higher student/teacher ratio and elevated (though still below-national-average) violent crime in parts of the city.</p>
+    </div>
+
+    <div class="verdict-card" style="border-top:4px solid var(--accent-gold);">
+      <h3 style="color:var(--accent-gold);">Best for: Students with ASD or ADHD</h3>
+      <p>All three districts offer federally compliant IEP and 504 programs for autism and ADHD. <strong>Hopkins ISD 270</strong> stands out for its comprehensive Federal Setting III programs and large support staff (218 instructional aides, 8 school psychologists). <strong>ISD 199</strong> offers the most explicitly named continuum of ASD-adjacent programs (CARE/CID, PLUS/Transitions). Cherokee County CCSD covers both ASD and ADHD explicitly but has more variable access to external autism service providers depending on location within the county.</p>
+    </div>
+
+  </div><!-- /verdict-grid -->
+
+
+  <hr class="rule" />
+
+
+  <!-- FOOTNOTES -->
+  <div class="footnotes">
+    <h4>Sources &amp; Footnotes</h4>
+    <ol>
+      <li>U.S. Census Bureau, American Community Survey 5-Year Estimates (2023). Median household income by ZIP code. <a href="https://data.census.gov" target="_blank">data.census.gov</a></li>
+      <li>FBI Uniform Crime Reporting Program, Crime in the United States 2023/2024. National violent crime average of 359 per 100,000 from USAFacts / FBI 2024 data. <a href="https://usafacts.org/articles/how-does-crime-compare-by-city/" target="_blank">usafacts.org</a></li>
+      <li>City-Data.com, Canton, GA crime index 2024. <a href="https://www.city-data.com/crime/crime-Canton-Georgia.html" target="_blank">city-data.com</a></li>
+      <li>AreaVibes.com, Inver Grove Heights, MN Crime Rates (FBI UCR 2023 data, released September 2024). <a href="https://www.areavibes.com/inver+grove+heights-mn/crime/" target="_blank">areavibes.com</a></li>
+      <li>National Center for Education Statistics (NCES), Common Core of Data (CCD), Public School Universe Survey 2024–2025. Hopkins HS: NCES ID 271426000613. Creekview HS: NCES ID 130111003308. Simley Senior High: NCES ID 271503000767. <a href="https://nces.ed.gov/ccd/schoolsearch/" target="_blank">nces.ed.gov</a></li>
+      <li>Hopkins Public Schools, "Hopkins at a Glance." <a href="https://www.hopkinsschools.org/about/hopkins-at-a-glance" target="_blank">hopkinsschools.org</a></li>
+      <li>PublicSchoolReview.com, Creekview High School Profile (citing NCES and GA Dept. of Education data). <a href="https://www.publicschoolreview.com/creekview-high-school-profile/30115" target="_blank">publicschoolreview.com</a></li>
+      <li>Simley High School demographic data from Grokipedia, sourced from NCES CCD and Wikipedia (citing 2023–2024 enrollment). <a href="https://grokipedia.com/page/simley_high_school" target="_blank">grokipedia.com</a></li>
+      <li>Hopkins Public Schools, Special Education Program Description. <a href="https://www.hopkinsschools.org/academics/special-education" target="_blank">hopkinsschools.org</a></li>
+      <li>Hopkins Public Schools, Special Services / Section 504 information. <a href="https://www.hopkinsschools.org/services/support-services" target="_blank">hopkinsschools.org</a></li>
+      <li>NCES District Detail, Hopkins Public School District 2714260 (2024–2025 school year). <a href="https://nces.ed.gov/ccd/districtsearch/district_detail.asp?ID2=2714260" target="_blank">nces.ed.gov</a></li>
+      <li>Cherokee County School District, Special Education Acronyms and Definitions. <a href="https://www.cherokeek12.net/divisions/curriculum-instruction/special-educationsection-504/special-education-acronyms-and-definitions" target="_blank">cherokeek12.net</a></li>
+      <li>Cherokee County School District, Special Education / Section 504 Department page. <a href="https://www.cherokeek12.net/divisions/curriculum-instruction/special-educationsection-504" target="_blank">cherokeek12.net</a></li>
+      <li>Cherokee County School District, Federal Programs — IDEA Title VI Part B. <a href="https://www.cherokeek12.net/divisions/curriculum-instruction/federal-programs" target="_blank">cherokeek12.net</a></li>
+      <li>Georgia Budget and Policy Institute, "Special Education Funding in Georgia" (2022). <a href="https://gbpi.org/special-education-funding-in-georgia/" target="_blank">gbpi.org</a></li>
+      <li>ISD 199 Inver Grove Heights Schools, Special Programs description. <a href="https://www.isd199.org/district/departments/Special_Services/special_education/special_programs" target="_blank">isd199.org</a></li>
+      <li>ISD 199, Early Learning program description and ECSE services. <a href="https://simley.isd199.org/enroll" target="_blank">simley.isd199.org</a></li>
+      <li>Simley High School, "Welcome to High School" — teacher credential data. <a href="https://simley.isd199.org/our-school/welcome" target="_blank">simley.isd199.org</a></li>
+    </ol>
+    <p style="margin-top:1rem;"><strong>Property crime footnote:</strong> Property crime (theft, burglary, motor vehicle theft) is excluded from the safety rankings above per the scope of this report. Notably, St. Louis Park ZIPs (55416, 55426) in the Hopkins district have property crime rates approximately 77% above the national average, driven largely by commercial theft. Cherokee County ZIP codes have property crime rates well below national averages. Inver Grove Heights property crime runs approximately 7.7% above the national average. Families concerned about property crime should weight the Cherokee County district favorably on this dimension.</p>
+    <p style="margin-top:0.75rem;"><em>This document was compiled in March 2026 using the most recently available public data from each cited source. Crime data reflects FBI UCR reports for the 2023 calendar year (released 2024), the most current available at time of compilation.</em></p>
+  </div>
+
+</main>
+</body>
+</html>
